@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/accounts")
@@ -33,9 +32,7 @@ public class AccountController {
         log.info("Request body: {}",
                 accountRequest);
 
-        AccountModel accountModel = newAccountModel(accountRequest);
-
-        accountService.saveAccount(accountModel);
+        AccountModel accountModel = accountService.saveAccount(accountRequest.getToken());
 
         /*
             curl -vvv -X POST -H "Content-Type: application/json" \
@@ -46,15 +43,6 @@ public class AccountController {
         AccountResponse accountResponse = new AccountResponse();
         accountResponse.setClientId(accountModel.getClientId());
         return ResponseEntity.ok(accountResponse);
-    }
-
-    private AccountModel newAccountModel(AccountRequest accountRequest) {
-        AccountModel accountModel = new AccountModel();
-        accountModel.setClientId(UUID.randomUUID().toString());
-        // TODO: encrypt AccountRequest.token
-        accountModel.setEncryptedToken("ENCRYPTED_TOKEN"); // TODO
-        accountModel.setProvider(AccountModel.Provider.GITHUB);
-        return accountModel;
     }
 
 }

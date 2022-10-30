@@ -3,6 +3,7 @@ package org.capybara.capybarabackend.account.service;
 import org.capybara.capybarabackend.account.domain.jpa.AccountEntity;
 import org.capybara.capybarabackend.account.model.AccountModel;
 import org.capybara.capybarabackend.account.repository.jpa.AccountRepository;
+import org.capybara.capybarabackend.account.service.cryptoservice.CryptoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,22 +21,40 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
 
+    private final CryptoService cryptoService;
+
     private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
     @Autowired
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository,
+                          CryptoService cryptoService) {
         this.accountRepository = accountRepository;
+        this.cryptoService = cryptoService;
     }
 
     @Transactional
-    public void saveAccount(@Valid AccountModel accountModel) {
+    public AccountModel saveAccount(@NotBlank String decryptedToken) {
         log.info("AccountService.saveAccount(accountModel) called");
-        log.info("accountModel: {}",
+
+        AccountModel accountModel = initAccountModel(decryptedToken);
+        log.info("initialised accountModel: {}",
                 accountModel);
+
         AccountEntity accountEntity = newAccountEntity(accountModel);
         accountEntity = accountRepository.saveAndFlush(accountEntity);
         log.info("saved accountEntity: {}",
                 accountEntity);
+
+        return accountModel;
+    }
+
+    private AccountModel initAccountModel(String decryptedToken) {
+        AccountModel accountModel = new AccountModel();
+        accountModel.setClientId(UUID.randomUUID().toString());
+        accountModel.setDecryptedToken(decryptedToken);
+        accountModel.setEncryptedToken(cryptoService.encryptSymmetric(accountModel.getDecryptedToken()));
+        accountModel.setProvider(AccountModel.Provider.GITHUB);
+        return accountModel;
     }
 
     private AccountEntity newAccountEntity(AccountModel accountModel) {
