@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS items (
+    id VARCHAR ( 36 ) PRIMARY KEY,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL,
+    name VARCHAR ( 255 ) UNIQUE NOT NULL
+);

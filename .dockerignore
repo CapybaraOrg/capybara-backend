@@ -1,0 +1,4 @@
+Dockerfile
+.dockerignore
+.github
+.gradle

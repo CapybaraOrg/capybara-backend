@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Git Ref (Optional)
+        required: false
+  push:
+    branches: [ main ]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    environment: main_build_environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (Latest)
+        if: github.event.inputs.git-ref == ''
+        uses: actions/checkout@v2.5.0
+      - name: Checkout (Custom Ref)
+        if: github.event.inputs.git-ref != ''
+        uses: actions/checkout@v2.5.0
+        with:
+          ref: ${{ github.event.inputs.git-ref }}
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.6.0
+        with:
+          java-version: 17
+          distribution: corretto
+      - name: Run local PostgreSQL
+        run: |
+          docker run --name main \
+            -e POSTGRES_USER=main  \
+            -e POSTGRES_PASSWORD=mysecretpassword \
+            -e POSTGRES_DB=main \
+            -p 5432:5432 \
+            -d \
+            postgres:14
+      - name: Build and Test
+        run: ./gradlew clean build
