@@ -9,7 +9,7 @@ public class IndexController {
 
     //<editor-fold desc="Public methods">
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<String> index() {
         return ResponseEntity.ok("OK");
     }
