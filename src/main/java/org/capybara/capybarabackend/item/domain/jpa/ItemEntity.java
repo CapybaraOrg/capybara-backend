@@ -17,7 +17,7 @@ public class ItemEntity extends BaseDateTimeEntity {
 
     //<editor-fold desc="Fields">
 
-    private String name = null;
+    private String name;
 
     //</editor-fold>
 

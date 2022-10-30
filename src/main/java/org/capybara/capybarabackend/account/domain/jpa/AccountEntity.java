@@ -1,0 +1,74 @@
+package org.capybara.capybarabackend.account.domain.jpa;
+
+import org.capybara.capybarabackend.common.domain.jpa.BaseDateTimeEntity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import static org.capybara.capybarabackend.account.model.AccountModel.CONSTRAINT_CLIENT_ID_MAX_SIZE;
+import static org.capybara.capybarabackend.account.model.AccountModel.CONSTRAINT_CLIENT_ID_MIN_SIZE;
+import static org.capybara.capybarabackend.account.model.AccountModel.CONSTRAINT_PROVIDER_MAX_SIZE;
+import static org.capybara.capybarabackend.account.model.AccountModel.CONSTRAINT_PROVIDER_MIN_SIZE;
+
+@Entity
+@Table(name = "accounts")
+public class AccountEntity extends BaseDateTimeEntity {
+
+    private String clientId;
+
+    private String encryptedToken;
+
+    private String provider;
+
+    public AccountEntity() {
+        // Empty constructor is required by JPA
+    }
+
+    @NotBlank
+    @Size(min = CONSTRAINT_CLIENT_ID_MIN_SIZE, max = CONSTRAINT_CLIENT_ID_MAX_SIZE)
+    @Column(name = "client_id", length = CONSTRAINT_CLIENT_ID_MAX_SIZE, unique = true, nullable = false)
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    @NotBlank
+    @Column(name = "encrypted_token", nullable = false)
+    public String getEncryptedToken() {
+        return encryptedToken;
+    }
+
+    public void setEncryptedToken(String encryptedToken) {
+        this.encryptedToken = encryptedToken;
+    }
+
+    @NotBlank
+    @Size(min = CONSTRAINT_PROVIDER_MIN_SIZE, max = CONSTRAINT_PROVIDER_MAX_SIZE)
+    @Column(name = "provider", length = CONSTRAINT_PROVIDER_MAX_SIZE, nullable = false)
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "AccountEntity[id=%s, " +
+                        "clientId='%s', " +
+                        "provider='%s']",
+                getId(),
+                getClientId(),
+                getProvider()
+        );
+    }
+
+}

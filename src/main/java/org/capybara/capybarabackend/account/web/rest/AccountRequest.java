@@ -19,7 +19,7 @@ public class AccountRequest {
     public String toString() {
         return String.format(
                 "AccountRequest[" +
-                        "provider='%s'" +
+                        "token='%s'" +
                         "]",
                 "<OBFUSCATED>"
         );

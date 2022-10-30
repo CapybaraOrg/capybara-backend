@@ -1,7 +1,10 @@
 package org.capybara.capybarabackend.account.web.rest;
 
+import org.capybara.capybarabackend.account.model.AccountModel;
+import org.capybara.capybarabackend.account.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +18,14 @@ import java.util.UUID;
 @RequestMapping("/v1/accounts")
 public class AccountController {
 
+    private final AccountService accountService;
+
     private static final Logger log = LoggerFactory.getLogger(AccountController.class);
+
+    @Autowired
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     @PostMapping
     public ResponseEntity<AccountResponse> create(@Valid @RequestBody AccountRequest accountRequest) {
@@ -23,9 +33,9 @@ public class AccountController {
         log.info("Request body: {}",
                 accountRequest);
 
-        // TODO: encrypt AccountRequest.token
-        // TODO: save to the database
-        // TODO: return the response with the client id
+        AccountModel accountModel = newAccountModel(accountRequest);
+
+        accountService.saveAccount(accountModel);
 
         /*
             curl -vvv -X POST -H "Content-Type: application/json" \
@@ -34,8 +44,17 @@ public class AccountController {
          */
 
         AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setClientId(UUID.randomUUID().toString());
+        accountResponse.setClientId(accountModel.getClientId());
         return ResponseEntity.ok(accountResponse);
+    }
+
+    private AccountModel newAccountModel(AccountRequest accountRequest) {
+        AccountModel accountModel = new AccountModel();
+        accountModel.setClientId(UUID.randomUUID().toString());
+        // TODO: encrypt AccountRequest.token
+        accountModel.setEncryptedToken("ENCRYPTED_TOKEN"); // TODO
+        accountModel.setProvider(AccountModel.Provider.GITHUB);
+        return accountModel;
     }
 
 }
