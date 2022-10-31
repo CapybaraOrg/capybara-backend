@@ -1,4 +1,4 @@
-package org.capybara.capybarabackend.github.workflow.run.common;
+package org.capybara.capybarabackend.common;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

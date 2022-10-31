@@ -1,4 +1,4 @@
-package org.capybara.capybarabackend.github.workflow.run.common;
+package org.capybara.capybarabackend.common;
 
 import java.time.LocalDateTime;
 

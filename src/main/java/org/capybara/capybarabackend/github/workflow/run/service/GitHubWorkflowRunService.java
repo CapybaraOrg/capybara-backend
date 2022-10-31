@@ -1,7 +1,6 @@
 package org.capybara.capybarabackend.github.workflow.run.service;
 
-import org.capybara.capybarabackend.github.workflow.run.common.RepoData;
-import org.capybara.capybarabackend.github.workflow.run.common.ScheduleData;
+import org.capybara.capybarabackend.common.ScheduleData;
 import org.capybara.capybarabackend.github.workflow.run.web.rest.GitHubWorkflowRunRequest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -19,10 +18,9 @@ public class GitHubWorkflowRunService {
     String bestTimeToStart; // TODO: move to local variable?
 
     public void schedule(GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
-// TODO: check if the GitHubWorkflowRunRequest.getClientId is valid
+        // TODO: check if the GitHubWorkflowRunRequest.getClientId is valid
         // TODO: call https://carbon-aware-api.azurewebsites.net/swagger/index.html API to calculate next run
 
-        RepoData repoData = gitHubWorkflowRunRequest.getRepoData();
         ScheduleData schedule = gitHubWorkflowRunRequest.getScheduleData();
 
         String bodyValues = "[{\n" +

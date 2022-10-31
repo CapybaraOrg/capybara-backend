@@ -1,7 +1,7 @@
 package org.capybara.capybarabackend.github.workflow.run.web.rest;
 
-import org.capybara.capybarabackend.github.workflow.run.common.RepoData;
-import org.capybara.capybarabackend.github.workflow.run.common.ScheduleData;
+import org.capybara.capybarabackend.common.RepoData;
+import org.capybara.capybarabackend.common.ScheduleData;
 
 public class GitHubWorkflowRunRequest {
 

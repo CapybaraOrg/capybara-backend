@@ -1,5 +1,6 @@
 package org.capybara.capybarabackend.scheduler.web.rest;
 
+import org.capybara.capybarabackend.scheduler.web.rest.service.ScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class SchedulerController {
 
     private static final Logger log = LoggerFactory.getLogger(SchedulerController.class);
+    ScheduleService scheduleService;
 
     @GetMapping
     public ResponseEntity<String> index() {
         log.info("Received GET /v1/scheduler request");
-
         // TODO: find all scheduled workflows to be called
         // TODO: call https://api.github.com/repos/DanailMinchev/github-actions-test/actions/workflows api
+//        scheduleService.triggerWorkflow();
 
         return ResponseEntity.ok("OK");
     }
