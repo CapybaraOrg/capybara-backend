@@ -3,9 +3,13 @@ package org.capybara.capybarabackend.github.workflow.run.web.rest;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.capybara.capybarabackend.github.workflow.run.common.RepoData;
+import org.capybara.capybarabackend.github.workflow.run.service.GitHubWorkflowRunService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,112 +26,53 @@ import javax.validation.Valid;
 @RequestMapping("/v1/github/workflows/runs")
 public class GitHubWorkflowRunController {
 
+    GitHubWorkflowRunService gitHubService;
+    @Value("${app-configuration-token}")
+    String githubTestToken;
+
     private static final Logger log = LoggerFactory.getLogger(GitHubWorkflowRunController.class);
-    String bestTimeToStart;
     @PostMapping
-    public ResponseEntity<Void> create(@Valid @RequestBody GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
+    public ResponseEntity<Void> schedule(@Valid @RequestBody GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
         log.info("Received POST /v1/github/workflows/runs request");
         log.info("Request body: {}",
                 gitHubWorkflowRunRequest);
 
-        // TODO: check if the GitHubWorkflowRunRequest.getClientId is valid
-        // TODO: call https://carbon-aware-api.azurewebsites.net/swagger/index.html API to calculate next run
+        gitHubService.schedule(gitHubWorkflowRunRequest);
 
-        GitHubWorkflowRunRequest.RepoData repoData = gitHubWorkflowRunRequest.getRepoData();
-        GitHubWorkflowRunRequest.ScheduleData schedule = gitHubWorkflowRunRequest.getScheduleData();
-
-        String bodyValues = "[{\n" +
-                "  \"requestedAt\": \"" + LocalDateTime.now() + "\",\n" +
-                "  \"location\": \"" + schedule.getLocation() + "\",\n" +
-                "  \"dataStartAt\": \"" + schedule.getStartDateTime() + "\",\n" +
-                "  \"dataEndAt\": \"" + schedule.getEndDateTime() + "\",\n" +
-                "  \"windowSize\": \"" + schedule.getDurationInMinutes() + "\"\n" +
-                "  }\n" +
-                "]";
-
-        WebClient webClient = WebClient.create();
-
-        try {
-            Mono<List<ForecastResponse<OptimalEndpoints>>> response = webClient.post()
-                    .uri("https://carbon-aware-api.azurewebsites.net/emissions/forecasts/batch")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .bodyValue(bodyValues)
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<ForecastResponse<OptimalEndpoints>>>() {
-                    });
-            List<ForecastResponse<OptimalEndpoints>> items = response.block();
-            for (ForecastResponse<OptimalEndpoints> item : items) {
-                bestTimeToStart = item.getOptimalDataPoints()[0].getTimestamp();
-                System.out.println("item optimal data endpoint start timestamp: " + item.getOptimalDataPoints()[0].getTimestamp());
-            }
-        } catch (WebClientResponseException.BadRequest e) {
-            System.out.println(e.getResponseBodyAsString());
-            System.out.println(bodyValues);
-            throw new RuntimeException(e);
-        }
-
-        // TODO: save the run in the database the schedule it
-        // TODO: return a response with the time when the workflow will be scheduled
-
-        /*
-            curl -vvv -X POST -H "Content-Type: application/json" \
-            -d '{"clientId": "d60881e1-69c0-45d0-9110-90736b490854", "workflowId": "example-workflow.yml", "ref": "main", "location": "eastus", "maximumDelayInSeconds": 36000}' \
-            http://localhost:8080/v1/github/workflows/runs
-         */
 
         return ResponseEntity.ok().build();
     }
 
-    private static class ForecastResponse<OptimalEndpoints> {
+    @PostMapping
+    public void triggerWorkflow(GitHubWorkflowRunRequest gitHubWorkflowRunRequest, String bestTimeToStart){
+        RepoData repoData = gitHubWorkflowRunRequest.getRepoData();
 
-        private OptimalEndpoints[] optimalDataPoints;
+        WebClient webClientGithub = WebClient
+                .builder()
+                .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/vnd.github+json")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubTestToken)
+                .baseUrl("https://api.github.com/")
+                .build();
 
-        public OptimalEndpoints[] getOptimalDataPoints() {
-            return optimalDataPoints;
-        }
+        // language=JSON
+        String bodyValuesGithubApi = "{\n" +
+                "  \"ref\": \"" + gitHubWorkflowRunRequest.getRepoData().getRef() + "\",\n" +
+                "  \"inputs\": {\n" +
+                "    \"isCapybaraDispatch\": \"" + gitHubWorkflowRunRequest.getRepoData().getIsCapybaraDispatch() + "\"\n" +
+                "  }\n" +
+                "}";
 
-        public void setOptimalDataPoints(OptimalEndpoints[] optimalDataPoints) {
-            this.optimalDataPoints = optimalDataPoints;
-        }
+        String githubUrl = String.format("/repos/%s/%s/actions/workflows/%s/dispatches", repoData.getOwner(), repoData.getRepoName(), repoData.getWorkflowId());
+        String githubApiResponse = webClientGithub.post()
+                .uri(githubUrl)
+                .bodyValue(bodyValuesGithubApi)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        System.out.println(githubApiResponse);
     }
 
-    private static class OptimalEndpoints {
-        String location;
-        String timestamp;
-        String duration;
-        float value;
 
-        public String getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(String timestamp) {
-            this.timestamp = timestamp;
-        }
-
-        public String getLocation() {
-            return location;
-        }
-
-        public void setLocation(String location) {
-            this.location = location;
-        }
-
-        public String getDuration() {
-            return duration;
-        }
-
-        public void setDuration(String duration) {
-            this.duration = duration;
-        }
-
-        public float getCarbonIntensityValue() {
-            return value;
-        }
-
-        public void setCarbonIntensityValue(float carbonIntensityValue) {
-            this.value = carbonIntensityValue;
-        }
-    }
 }
