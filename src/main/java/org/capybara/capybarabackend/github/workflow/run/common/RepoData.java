@@ -3,6 +3,7 @@ package org.capybara.capybarabackend.github.workflow.run.common;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+// TODO: Move it to inner class?
 public class RepoData {
     private String clientId;
 
@@ -10,14 +11,14 @@ public class RepoData {
 
     private String ref;
 
-    private String location;
+    private String location; // TODO: move to ScheduleData
 
-    private String isCapybaraDispatch;
+    private String isCapybaraDispatch; // TODO: move to GitHubWorkflowRunRequest
 
-    private Integer maximumDelayInSeconds;
+    private Integer maximumDelayInSeconds;  // TODO: move to ScheduleData
 
-    private String owner;
-    private String repoName;
+    private String owner; // TODO: move to RepoData
+    private String repoName; // TODO: move to RepoData
 
     @NotBlank
     public String getClientId() {
@@ -62,6 +63,7 @@ public class RepoData {
     public void setIsCapybaraDispatch(String isCapybaraDispatch) {
         this.isCapybaraDispatch = isCapybaraDispatch;
     }
+
     @NotNull
     public Integer getMaximumDelayInSeconds() {
         return maximumDelayInSeconds;

@@ -6,3 +6,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/main
     username: main
     password: mysecretpassword
+
+tmp:
+  app-configuration-token: ${CAPYBARA_GITHUB_TOKEN}

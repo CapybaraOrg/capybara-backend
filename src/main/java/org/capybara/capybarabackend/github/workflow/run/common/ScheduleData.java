@@ -2,13 +2,14 @@ package org.capybara.capybarabackend.github.workflow.run.common;
 
 import java.time.LocalDateTime;
 
+// TODO: Move it to inner class?
 public class ScheduleData {
-    private LocalDateTime startDateTime;
-    private LocalDateTime endDateTime;
+    private LocalDateTime startDateTime; // TODO: remove
+    private LocalDateTime endDateTime; // TODO: remove
 
-    private int durationInMinutes;
+    private int durationInMinutes; // TODO: remove / replace?
 
-    private String location;
+    private String location; // TODO: merge
 
     public LocalDateTime getStartDateTime() {
         return startDateTime;
