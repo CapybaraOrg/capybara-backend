@@ -17,6 +17,8 @@ public class SchedulerController {
     public ResponseEntity<String> index() {
         log.info("Received GET /v1/scheduler request");
 
+
+
         // TODO: find all scheduled workflows to be called
         // TODO: call https://api.github.com/repos/DanailMinchev/github-actions-test/actions/workflows api
 

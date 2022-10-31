@@ -1,12 +1,20 @@
 package org.capybara.capybarabackend.github.workflow.run.web.rest;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
@@ -15,7 +23,7 @@ import javax.validation.Valid;
 public class GitHubWorkflowRunController {
 
     private static final Logger log = LoggerFactory.getLogger(GitHubWorkflowRunController.class);
-
+    String bestTimeToStart;
     @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
         log.info("Received POST /v1/github/workflows/runs request");
@@ -24,6 +32,41 @@ public class GitHubWorkflowRunController {
 
         // TODO: check if the GitHubWorkflowRunRequest.getClientId is valid
         // TODO: call https://carbon-aware-api.azurewebsites.net/swagger/index.html API to calculate next run
+
+        GitHubWorkflowRunRequest.RepoData repoData = gitHubWorkflowRunRequest.getRepoData();
+        GitHubWorkflowRunRequest.ScheduleData schedule = gitHubWorkflowRunRequest.getScheduleData();
+
+        String bodyValues = "[{\n" +
+                "  \"requestedAt\": \"" + LocalDateTime.now() + "\",\n" +
+                "  \"location\": \"" + schedule.getLocation() + "\",\n" +
+                "  \"dataStartAt\": \"" + schedule.getStartDateTime() + "\",\n" +
+                "  \"dataEndAt\": \"" + schedule.getEndDateTime() + "\",\n" +
+                "  \"windowSize\": \"" + schedule.getDurationInMinutes() + "\"\n" +
+                "  }\n" +
+                "]";
+
+        WebClient webClient = WebClient.create();
+
+        try {
+            Mono<List<ForecastResponse<OptimalEndpoints>>> response = webClient.post()
+                    .uri("https://carbon-aware-api.azurewebsites.net/emissions/forecasts/batch")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue(bodyValues)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<ForecastResponse<OptimalEndpoints>>>() {
+                    });
+            List<ForecastResponse<OptimalEndpoints>> items = response.block();
+            for (ForecastResponse<OptimalEndpoints> item : items) {
+                bestTimeToStart = item.getOptimalDataPoints()[0].getTimestamp();
+                System.out.println("item optimal data endpoint start timestamp: " + item.getOptimalDataPoints()[0].getTimestamp());
+            }
+        } catch (WebClientResponseException.BadRequest e) {
+            System.out.println(e.getResponseBodyAsString());
+            System.out.println(bodyValues);
+            throw new RuntimeException(e);
+        }
+
         // TODO: save the run in the database the schedule it
         // TODO: return a response with the time when the workflow will be scheduled
 
@@ -36,4 +79,55 @@ public class GitHubWorkflowRunController {
         return ResponseEntity.ok().build();
     }
 
+    private static class ForecastResponse<OptimalEndpoints> {
+
+        private OptimalEndpoints[] optimalDataPoints;
+
+        public OptimalEndpoints[] getOptimalDataPoints() {
+            return optimalDataPoints;
+        }
+
+        public void setOptimalDataPoints(OptimalEndpoints[] optimalDataPoints) {
+            this.optimalDataPoints = optimalDataPoints;
+        }
+    }
+
+    private static class OptimalEndpoints {
+        String location;
+        String timestamp;
+        String duration;
+        float value;
+
+        public String getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(String timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        public String getDuration() {
+            return duration;
+        }
+
+        public void setDuration(String duration) {
+            this.duration = duration;
+        }
+
+        public float getCarbonIntensityValue() {
+            return value;
+        }
+
+        public void setCarbonIntensityValue(float carbonIntensityValue) {
+            this.value = carbonIntensityValue;
+        }
+    }
 }
