@@ -46,7 +46,7 @@ class CryptoServiceGCPImpl implements CryptoService {
         // Encrypt the plaintext.
         EncryptResponse response = keyManagementServiceClient.encrypt(keyName, ByteString.copyFromUtf8(plaintext));
 
-        return response.getCiphertext().toStringUtf8();
+        return response.getCiphertext().toStringUtf8().replaceAll("\u0000", "");
     }
 
     @Override
