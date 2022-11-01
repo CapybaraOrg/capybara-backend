@@ -16,13 +16,13 @@ import javax.validation.Valid;
 @RequestMapping("/v1/github/workflows/runs")
 public class GitHubWorkflowRunController {
 
-    private final GitHubWorkflowRunService gitHubService;
+    private final GitHubWorkflowRunService gitHubWorkflowRunService;
 
     private static final Logger log = LoggerFactory.getLogger(GitHubWorkflowRunController.class);
 
     @Autowired
-    public GitHubWorkflowRunController(GitHubWorkflowRunService gitHubService) {
-        this.gitHubService = gitHubService;
+    public GitHubWorkflowRunController(GitHubWorkflowRunService gitHubWorkflowRunService) {
+        this.gitHubWorkflowRunService = gitHubWorkflowRunService;
     }
 
     @PostMapping
@@ -31,7 +31,7 @@ public class GitHubWorkflowRunController {
         log.info("Request body: {}",
                 gitHubWorkflowRunRequest);
 
-        gitHubService.schedule(gitHubWorkflowRunRequest);
+        gitHubWorkflowRunService.schedule(gitHubWorkflowRunRequest);
 
         return ResponseEntity.ok().build();
     }

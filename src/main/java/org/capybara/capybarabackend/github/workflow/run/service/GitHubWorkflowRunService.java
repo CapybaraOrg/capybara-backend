@@ -1,39 +1,45 @@
 package org.capybara.capybarabackend.github.workflow.run.service;
 
-import org.capybara.capybarabackend.common.ScheduleData;
 import org.capybara.capybarabackend.github.workflow.run.web.rest.GitHubWorkflowRunRequest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Validated
 public class GitHubWorkflowRunService {
 
-    String bestTimeToStart; // TODO: move to local variable?
+    private static final int DEFAULT_APPROXIMATE_WORKFLOW_RUN_DURATION_IN_MINUTES = 5;
 
-    public void schedule(GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
+    public void schedule(@Valid GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
         // TODO: check if the GitHubWorkflowRunRequest.getClientId is valid
         // TODO: call https://carbon-aware-api.azurewebsites.net/swagger/index.html API to calculate next run
 
-        ScheduleData schedule = gitHubWorkflowRunRequest.getScheduleData();
-
+        LocalDateTime now = LocalDateTime.now();
+        Integer approximateWorkflowRunDurationInMinutes = gitHubWorkflowRunRequest.getSchedule().getApproximateWorkflowRunDurationInMinutes() != null ?
+                gitHubWorkflowRunRequest.getSchedule().getApproximateWorkflowRunDurationInMinutes() :
+                DEFAULT_APPROXIMATE_WORKFLOW_RUN_DURATION_IN_MINUTES;
+        // TODO: test request
         String bodyValues = "[{\n" +
-                "  \"requestedAt\": \"" + LocalDateTime.now() + "\",\n" +
-                "  \"location\": \"" + schedule.getLocation() + "\",\n" +
-                "  \"dataStartAt\": \"" + schedule.getStartDateTime() + "\",\n" +
-                "  \"dataEndAt\": \"" + schedule.getEndDateTime() + "\",\n" +
-                "  \"windowSize\": \"" + schedule.getDurationInMinutes() + "\"\n" +
+                "  \"requestedAt\": \"" + now + "\",\n" +
+                "  \"location\": \"" + gitHubWorkflowRunRequest.getSchedule().getLocation() + "\",\n" +
+                "  \"dataStartAt\": \"" + now + "\",\n" +
+                "  \"dataEndAt\": \"" + now.plusSeconds(gitHubWorkflowRunRequest.getSchedule().getMaximumDelayInSeconds()) + "\",\n" +
+                "  \"windowSize\": " + approximateWorkflowRunDurationInMinutes + "\n" +
                 "  }\n" +
                 "]";
 
         WebClient webClient = WebClient.create();
 
+        String bestTimeToStart;
         try {
             Mono<List<ForecastResponse<OptimalEndpoints>>> response = webClient.post()
                     .uri("https://carbon-aware-api.azurewebsites.net/emissions/forecasts/batch")
