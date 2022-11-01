@@ -39,14 +39,14 @@ class CryptoServiceGCPImpl implements CryptoService {
     }
 
     @Override
-    public String encryptSymmetric(String plaintext) {
+    public byte[] encryptSymmetric(String plaintext) {
         // Build the key version name from the project, location, key ring and key
         CryptoKeyName keyName = CryptoKeyName.of(cloudGoogleProjectId, cloudGoogleRegion, cloudGoogleCryptoKeyRingId, cloudGoogleCryptoKeyId);
 
         // Encrypt the plaintext.
         EncryptResponse response = keyManagementServiceClient.encrypt(keyName, ByteString.copyFromUtf8(plaintext));
 
-        return response.getCiphertext().toStringUtf8().replaceAll("\u0000", "");
+        return response.getCiphertext().toByteArray();
     }
 
     @Override

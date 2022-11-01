@@ -1,11 +1,13 @@
 package org.capybara.capybarabackend.account.domain.jpa;
 
 import org.capybara.capybarabackend.common.domain.jpa.BaseDateTimeEntity;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import static org.capybara.capybarabackend.account.model.AccountModel.CONSTRAINT_CLIENT_ID_MAX_SIZE;
@@ -19,7 +21,7 @@ public class AccountEntity extends BaseDateTimeEntity {
 
     private String clientId;
 
-    private String encryptedToken;
+    private byte[] encryptedToken;
 
     private String provider;
 
@@ -38,13 +40,14 @@ public class AccountEntity extends BaseDateTimeEntity {
         this.clientId = clientId;
     }
 
-    @NotBlank
+    @NotNull
+    @Type(type = "org.hibernate.type.BinaryType")
     @Column(name = "encrypted_token", nullable = false)
-    public String getEncryptedToken() {
+    public byte[] getEncryptedToken() {
         return encryptedToken;
     }
 
-    public void setEncryptedToken(String encryptedToken) {
+    public void setEncryptedToken(byte[] encryptedToken) {
         this.encryptedToken = encryptedToken;
     }
 

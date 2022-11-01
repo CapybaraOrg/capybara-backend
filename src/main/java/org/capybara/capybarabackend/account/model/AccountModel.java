@@ -19,7 +19,7 @@ public class AccountModel {
 
     private String decryptedToken;
 
-    private String encryptedToken;
+    private byte[] encryptedToken;
 
     private Provider provider;
 
@@ -46,11 +46,11 @@ public class AccountModel {
         this.decryptedToken = decryptedToken;
     }
 
-    public String getEncryptedToken() {
+    public byte[] getEncryptedToken() {
         return encryptedToken;
     }
 
-    public void setEncryptedToken(String encryptedToken) {
+    public void setEncryptedToken(byte[] encryptedToken) {
         this.encryptedToken = encryptedToken;
     }
 
