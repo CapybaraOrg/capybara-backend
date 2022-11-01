@@ -5,6 +5,7 @@ import com.google.cloud.kms.v1.DecryptResponse;
 import com.google.cloud.kms.v1.EncryptResponse;
 import com.google.cloud.kms.v1.KeyManagementServiceClient;
 import com.google.protobuf.ByteString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ class CryptoServiceGCPImpl implements CryptoService {
 
     private final String cloudGoogleCryptoKeyId;
 
+    @Autowired
     CryptoServiceGCPImpl(KeyManagementServiceClient keyManagementServiceClient,
                          @Value("${cloud.google.project-id}") String cloudGoogleProjectId,
                          @Value("${cloud.google.region}") String cloudGoogleRegion,

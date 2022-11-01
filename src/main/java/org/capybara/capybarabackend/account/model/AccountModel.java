@@ -6,6 +6,9 @@ import javax.validation.constraints.Size;
 
 public class AccountModel {
 
+    public static final int CONSTRAINT_ID_MIN_SIZE = 36;
+    public static final int CONSTRAINT_ID_MAX_SIZE = 36;
+
     public static final int CONSTRAINT_CLIENT_ID_MIN_SIZE = 36;
     public static final int CONSTRAINT_CLIENT_ID_MAX_SIZE = 36;
 
@@ -14,6 +17,8 @@ public class AccountModel {
 
     public static final int CONSTRAINT_PROVIDER_MIN_SIZE = 1;
     public static final int CONSTRAINT_PROVIDER_MAX_SIZE = 50;
+
+    private String id;
 
     private String clientId;
 
@@ -25,6 +30,15 @@ public class AccountModel {
 
     public enum Provider {
         GITHUB
+    }
+
+    @Size(min = CONSTRAINT_ID_MIN_SIZE, max = CONSTRAINT_ID_MAX_SIZE)
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @NotBlank

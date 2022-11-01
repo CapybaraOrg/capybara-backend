@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -48,6 +49,11 @@ public class AccountService {
         return accountModel;
     }
 
+    public Optional<AccountModel> findByClientId(@NotBlank String clientId) {
+        Optional<AccountEntity> optionalAccountEntity = accountRepository.findByClientId(clientId);
+        return optionalAccountEntity.map(this::newAccountModel);
+    }
+
     private AccountModel initAccountModel(String decryptedToken) {
         AccountModel accountModel = new AccountModel();
         accountModel.setClientId(UUID.randomUUID().toString());
@@ -67,6 +73,16 @@ public class AccountService {
         accountEntity.setEncryptedToken(accountModel.getEncryptedToken());
         accountEntity.setProvider(accountModel.getProvider().toString());
         return accountEntity;
+    }
+
+    private AccountModel newAccountModel(AccountEntity accountEntity) {
+        AccountModel accountModel = new AccountModel();
+        accountModel.setId(accountModel.getId());
+        accountModel.setClientId(accountEntity.getClientId());
+        accountModel.setDecryptedToken(accountModel.getDecryptedToken());
+        accountModel.setEncryptedToken(accountEntity.getEncryptedToken());
+        accountModel.setProvider(AccountModel.Provider.valueOf(accountEntity.getProvider()));
+        return accountModel;
     }
 
 }

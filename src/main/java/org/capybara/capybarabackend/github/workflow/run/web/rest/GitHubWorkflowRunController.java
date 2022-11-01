@@ -1,6 +1,9 @@
 package org.capybara.capybarabackend.github.workflow.run.web.rest;
 
+import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunRequestModel;
+import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunResponseModel;
 import org.capybara.capybarabackend.github.workflow.run.service.GitHubWorkflowRunService;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +29,25 @@ public class GitHubWorkflowRunController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> schedule(@Valid @RequestBody GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
+    public ResponseEntity<GitHubWorkflowRunResponse> schedule(@Valid @RequestBody GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
         log.info("Received POST /v1/github/workflows/runs request");
         log.info("Request body: {}",
                 gitHubWorkflowRunRequest);
 
-        gitHubWorkflowRunService.schedule(gitHubWorkflowRunRequest);
+        GitHubWorkflowRunResponseModel gitHubWorkflowRunResponseModel =
+                gitHubWorkflowRunService.schedule(newGitHubWorkflowRunRequestModel(gitHubWorkflowRunRequest));
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(newGitHubWorkflowRunResponse(gitHubWorkflowRunResponseModel));
     }
 
+    private GitHubWorkflowRunRequestModel newGitHubWorkflowRunRequestModel(GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(gitHubWorkflowRunRequest, GitHubWorkflowRunRequestModel.class);
+    }
+
+    private GitHubWorkflowRunResponse newGitHubWorkflowRunResponse(GitHubWorkflowRunResponseModel gitHubWorkflowRunResponseModel) {
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(gitHubWorkflowRunResponseModel, GitHubWorkflowRunResponse.class);
+    }
 
 }

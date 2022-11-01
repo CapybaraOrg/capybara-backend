@@ -34,12 +34,6 @@ public class AccountController {
 
         AccountModel accountModel = accountService.saveAccount(accountRequest.getToken());
 
-        /*
-            curl -vvv -X POST -H "Content-Type: application/json" \
-            -d '{"token": "d60881e1-69c0-45d0-9110-90736b490854"}' \
-            http://localhost:8080/v1/accounts
-         */
-
         AccountResponse accountResponse = new AccountResponse();
         accountResponse.setClientId(accountModel.getClientId());
         return ResponseEntity.ok(accountResponse);

@@ -1,10 +1,10 @@
-package org.capybara.capybarabackend.github.workflow.run.web.rest;
+package org.capybara.capybarabackend.github.workflow.run.model;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class GitHubWorkflowRunRequest {
+public class GitHubWorkflowRunRequestModel {
 
     private String clientId;
 
@@ -168,6 +168,7 @@ public class GitHubWorkflowRunRequest {
         }
 
     }
+
 
 }
 
