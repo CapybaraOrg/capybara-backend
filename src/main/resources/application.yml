@@ -10,6 +10,3 @@ spring:
 dependencies:
   carbon-aware-api:
     url: ${CARBON_AWARE_API_URL:https://carbon-aware-api.azurewebsites.net}
-
-tmp:
-  app-configuration-token: ${CAPYBARA_GITHUB_TOKEN}

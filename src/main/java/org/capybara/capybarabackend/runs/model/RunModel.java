@@ -62,4 +62,15 @@ public class RunModel {
         NEW, DONE
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+                "RunModel[id='%s', accountModel.clientId='%s', status='%s', scheduledTime='%s']",
+                getId(),
+                getAccountModel().getClientId(),
+                getStatus().toString(),
+                getScheduledTime()
+        );
+    }
+
 }

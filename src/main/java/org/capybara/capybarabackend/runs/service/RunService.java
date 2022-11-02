@@ -2,6 +2,8 @@ package org.capybara.capybarabackend.runs.service;
 
 import org.capybara.capybarabackend.account.domain.jpa.AccountEntity;
 import org.capybara.capybarabackend.account.repository.jpa.AccountRepository;
+import org.capybara.capybarabackend.account.service.AccountService;
+import org.capybara.capybarabackend.account.service.cryptoservice.CryptoService;
 import org.capybara.capybarabackend.runs.domain.jpa.RunEntity;
 import org.capybara.capybarabackend.runs.model.RunModel;
 import org.capybara.capybarabackend.runs.repository.jpa.RunRepository;
@@ -14,12 +16,16 @@ import org.springframework.validation.annotation.Validated;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @Validated
 public class RunService {
+
+    private final CryptoService cryptoService;
 
     private final RunRepository runRepository;
 
@@ -28,8 +34,10 @@ public class RunService {
     private static final Logger log = LoggerFactory.getLogger(RunService.class);
 
     @Autowired
-    public RunService(RunRepository runRepository,
+    public RunService(CryptoService cryptoService,
+                      RunRepository runRepository,
                       AccountRepository accountRepository) {
+        this.cryptoService = cryptoService;
         this.runRepository = runRepository;
         this.accountRepository = accountRepository;
     }
@@ -40,6 +48,17 @@ public class RunService {
         log.info(runModel.toString());
         RunEntity runEntity = newRunEntity(runModel);
         runRepository.saveAndFlush(runEntity);
+    }
+
+    public List<RunModel> findTopNew() {
+        List<RunModel> result = new ArrayList<>();
+
+        List<RunEntity> runEntityList = runRepository.findTop5ByStatusOrderByCreatedDesc(RunModel.Status.NEW.toString());
+        for (RunEntity current : runEntityList) {
+            result.add(newRunModel(current));
+        }
+
+        return result;
     }
 
     private RunEntity newRunEntity(RunModel runModel) {
@@ -58,6 +77,22 @@ public class RunService {
         runEntity.setAccount(optionalAccountEntity.get());
 
         return runEntity;
+    }
+
+    private RunModel newRunModel(RunEntity runEntity) {
+        RunModel runModel = new RunModel();
+
+        runModel.setId(runEntity.getId());
+        runModel.setAccountModel(
+                AccountService.newAccountModel(
+                        runEntity.getAccount(),
+                        cryptoService.decryptSymmetric(runEntity.getAccount().getEncryptedToken())
+                )
+        );
+        runModel.setStatus(RunModel.Status.valueOf(runEntity.getStatus()));
+        runModel.setScheduledTime(runEntity.getScheduledTime());
+
+        return runModel;
     }
 
 }

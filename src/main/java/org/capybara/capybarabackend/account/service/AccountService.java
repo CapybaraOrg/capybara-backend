@@ -51,7 +51,13 @@ public class AccountService {
 
     public Optional<AccountModel> findByClientId(@NotBlank String clientId) {
         Optional<AccountEntity> optionalAccountEntity = accountRepository.findByClientId(clientId);
-        return optionalAccountEntity.map(this::newAccountModel);
+
+        if (optionalAccountEntity.isPresent()) {
+            AccountModel accountModel = newAccountModel(optionalAccountEntity.get(), null);
+            return Optional.of(accountModel);
+        }
+
+        return Optional.empty();
     }
 
     private AccountModel initAccountModel(String decryptedToken) {
@@ -75,11 +81,11 @@ public class AccountService {
         return accountEntity;
     }
 
-    private AccountModel newAccountModel(AccountEntity accountEntity) {
+    public static AccountModel newAccountModel(AccountEntity accountEntity, String decryptedToken) {
         AccountModel accountModel = new AccountModel();
         accountModel.setId(accountEntity.getId());
         accountModel.setClientId(accountEntity.getClientId());
-        accountModel.setDecryptedToken(accountModel.getDecryptedToken());
+        accountModel.setDecryptedToken(decryptedToken);
         accountModel.setEncryptedToken(accountEntity.getEncryptedToken());
         accountModel.setProvider(AccountModel.Provider.valueOf(accountEntity.getProvider()));
         return accountModel;
