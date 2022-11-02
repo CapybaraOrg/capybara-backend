@@ -8,6 +8,8 @@ import org.capybara.capybarabackend.common.clients.carbonawareapi.ForecastBatchR
 import org.capybara.capybarabackend.common.clients.carbonawareapi.ForecastBatchResponse;
 import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunRequestModel;
 import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunResponseModel;
+import org.capybara.capybarabackend.runs.model.RunModel;
+import org.capybara.capybarabackend.runs.service.RunService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -24,14 +26,18 @@ public class GitHubWorkflowRunService {
 
     private final AccountService accountService;
 
+    private final RunService runService;
+
     private final CarbonAwareApiClient carbonAwareApiClient;
 
     private static final int DEFAULT_APPROXIMATE_WORKFLOW_RUN_DURATION_IN_MINUTES = 5;
 
     @Autowired
     public GitHubWorkflowRunService(AccountService accountService,
+                                    RunService runService,
                                     CarbonAwareApiClient carbonAwareApiClient) {
         this.accountService = accountService;
+        this.runService = runService;
         this.carbonAwareApiClient = carbonAwareApiClient;
     }
 
@@ -62,9 +68,19 @@ public class GitHubWorkflowRunService {
         GitHubWorkflowRunResponseModel gitHubWorkflowRunResponseModel = new GitHubWorkflowRunResponseModel();
         gitHubWorkflowRunResponseModel.setBestTimeToStart(bestTimeToStart);
 
-        // TODO: save the run in the database to schedule it
+        runService.saveRun(newRunModel(optionalAccountModel.get(), bestTimeToStart));
 
         return gitHubWorkflowRunResponseModel;
+    }
+
+    private RunModel newRunModel(AccountModel accountModel, OffsetDateTime scheduledTime) {
+        RunModel runModel = new RunModel();
+
+        runModel.setAccountModel(accountModel);
+        runModel.setStatus(RunModel.Status.NEW);
+        runModel.setScheduledTime(scheduledTime);
+
+        return runModel;
     }
 
 }

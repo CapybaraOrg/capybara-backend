@@ -28,10 +28,6 @@ public class AccountModel {
 
     private Provider provider;
 
-    public enum Provider {
-        GITHUB
-    }
-
     @Size(min = CONSTRAINT_ID_MIN_SIZE, max = CONSTRAINT_ID_MAX_SIZE)
     public String getId() {
         return id;
@@ -84,6 +80,10 @@ public class AccountModel {
                 getClientId(),
                 getProvider()
         );
+    }
+
+    public enum Provider {
+        GITHUB
     }
 
 }

@@ -1,14 +1,19 @@
 package org.capybara.capybarabackend.account.domain.jpa;
 
 import org.capybara.capybarabackend.common.domain.jpa.BaseDateTimeEntity;
+import org.capybara.capybarabackend.runs.domain.jpa.RunEntity;
 import org.hibernate.annotations.Type;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.capybara.capybarabackend.account.model.AccountModel.CONSTRAINT_CLIENT_ID_MAX_SIZE;
 import static org.capybara.capybarabackend.account.model.AccountModel.CONSTRAINT_CLIENT_ID_MIN_SIZE;
@@ -24,6 +29,8 @@ public class AccountEntity extends BaseDateTimeEntity {
     private byte[] encryptedToken;
 
     private String provider;
+
+    private List<RunEntity> runs = new ArrayList<>();
 
     public AccountEntity() {
         // Empty constructor is required by JPA
@@ -60,6 +67,15 @@ public class AccountEntity extends BaseDateTimeEntity {
 
     public void setProvider(String provider) {
         this.provider = provider;
+    }
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<RunEntity> getRuns() {
+        return runs;
+    }
+
+    public void setRuns(List<RunEntity> runs) {
+        this.runs = runs;
     }
 
     @Override

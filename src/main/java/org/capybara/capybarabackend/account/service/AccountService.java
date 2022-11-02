@@ -77,7 +77,7 @@ public class AccountService {
 
     private AccountModel newAccountModel(AccountEntity accountEntity) {
         AccountModel accountModel = new AccountModel();
-        accountModel.setId(accountModel.getId());
+        accountModel.setId(accountEntity.getId());
         accountModel.setClientId(accountEntity.getClientId());
         accountModel.setDecryptedToken(accountModel.getDecryptedToken());
         accountModel.setEncryptedToken(accountEntity.getEncryptedToken());
