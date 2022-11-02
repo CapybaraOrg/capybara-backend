@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -28,6 +31,7 @@ public class ScheduleService {
         this.gitHubApiClient = gitHubApiClient;
     }
 
+    @Transactional
     public void triggerWorkflow() throws
             JsonProcessingException {
         List<RunModel> runModelList = runService.findTopNew();
@@ -36,12 +40,17 @@ public class ScheduleService {
         for (RunModel currentRunModel : runModelList) {
             log.info("Current run: {}", currentRunModel);
 
-            // TODO: add scheduling logic
-
-            gitHubApiClient.workflowDispatch(
-                    currentRunModel.getAccountModel().getDecryptedToken(),
-                    newWorkflowDispatchRequest(currentRunModel)
-            );
+            if (Instant.now().atOffset(ZoneOffset.UTC).isAfter(currentRunModel.getScheduledTime())) {
+                log.info("Executing run: {}", currentRunModel);
+                gitHubApiClient.workflowDispatch(
+                        currentRunModel.getAccountModel().getDecryptedToken(),
+                        newWorkflowDispatchRequest(currentRunModel)
+                );
+                currentRunModel.setStatus(RunModel.Status.DONE);
+                runService.saveRun(currentRunModel);
+            } else {
+                log.info("Skipping run: {}", currentRunModel);
+            }
         }
     }
 

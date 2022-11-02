@@ -54,7 +54,7 @@ public class RunService {
     public List<RunModel> findTopNew() {
         List<RunModel> result = new ArrayList<>();
 
-        List<RunEntity> runEntityList = runRepository.findTop5ByStatusOrderByCreatedDesc(RunModel.Status.NEW.toString());
+        List<RunEntity> runEntityList = runRepository.findTop5ByStatusOrderByScheduledTimeAsc(RunModel.Status.NEW.toString());
         for (RunEntity current : runEntityList) {
             result.add(newRunModel(current));
         }

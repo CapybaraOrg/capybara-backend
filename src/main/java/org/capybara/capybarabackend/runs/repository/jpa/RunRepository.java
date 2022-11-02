@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface RunRepository extends JpaRepository<RunEntity, String> {
 
-    List<RunEntity> findTop5ByStatusOrderByCreatedDesc(String status);
+    List<RunEntity> findTop5ByStatusOrderByScheduledTimeAsc(String status);
 
 }
