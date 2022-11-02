@@ -1,24 +1,24 @@
 package org.capybara.capybarabackend.common.clients.carbonawareapi;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class ForecastBatchRequest {
 
-    private LocalDateTime requestedAt;
+    private OffsetDateTime requestedAt;
 
     private String location;
 
-    private LocalDateTime dataStartAt;
+    private OffsetDateTime dataStartAt;
 
-    private LocalDateTime dataEndAt;
+    private OffsetDateTime dataEndAt;
 
     private Integer windowSize;
 
-    public LocalDateTime getRequestedAt() {
+    public OffsetDateTime getRequestedAt() {
         return requestedAt;
     }
 
-    public void setRequestedAt(LocalDateTime requestedAt) {
+    public void setRequestedAt(OffsetDateTime requestedAt) {
         this.requestedAt = requestedAt;
     }
 
@@ -30,19 +30,19 @@ public class ForecastBatchRequest {
         this.location = location;
     }
 
-    public LocalDateTime getDataStartAt() {
+    public OffsetDateTime getDataStartAt() {
         return dataStartAt;
     }
 
-    public void setDataStartAt(LocalDateTime dataStartAt) {
+    public void setDataStartAt(OffsetDateTime dataStartAt) {
         this.dataStartAt = dataStartAt;
     }
 
-    public LocalDateTime getDataEndAt() {
+    public OffsetDateTime getDataEndAt() {
         return dataEndAt;
     }
 
-    public void setDataEndAt(LocalDateTime dataEndAt) {
+    public void setDataEndAt(OffsetDateTime dataEndAt) {
         this.dataEndAt = dataEndAt;
     }
 

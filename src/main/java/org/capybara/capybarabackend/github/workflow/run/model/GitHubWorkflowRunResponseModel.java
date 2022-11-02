@@ -1,16 +1,16 @@
 package org.capybara.capybarabackend.github.workflow.run.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class GitHubWorkflowRunResponseModel {
 
-    private LocalDateTime bestTimeToStart;
+    private OffsetDateTime bestTimeToStart;
 
-    public LocalDateTime getBestTimeToStart() {
+    public OffsetDateTime getBestTimeToStart() {
         return bestTimeToStart;
     }
 
-    public void setBestTimeToStart(LocalDateTime bestTimeToStart) {
+    public void setBestTimeToStart(OffsetDateTime bestTimeToStart) {
         this.bestTimeToStart = bestTimeToStart;
     }
 

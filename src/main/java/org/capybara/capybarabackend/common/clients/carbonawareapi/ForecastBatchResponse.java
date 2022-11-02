@@ -1,16 +1,16 @@
 package org.capybara.capybarabackend.common.clients.carbonawareapi;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class ForecastBatchResponse {
 
-    private OptimalDataPoints optimalDataPoints;
+    private OptimalDataPoints[] optimalDataPoints;
 
-    public OptimalDataPoints getOptimalDataPoints() {
+    public OptimalDataPoints[] getOptimalDataPoints() {
         return optimalDataPoints;
     }
 
-    public void setOptimalDataPoints(OptimalDataPoints optimalDataPoints) {
+    public void setOptimalDataPoints(OptimalDataPoints[] optimalDataPoints) {
         this.optimalDataPoints = optimalDataPoints;
     }
 
@@ -18,7 +18,7 @@ public class ForecastBatchResponse {
 
         private String location;
 
-        private LocalDateTime timestamp;
+        private OffsetDateTime timestamp;
 
         private Integer duration;
 
@@ -32,11 +32,11 @@ public class ForecastBatchResponse {
             this.location = location;
         }
 
-        public LocalDateTime getTimestamp() {
+        public OffsetDateTime getTimestamp() {
             return timestamp;
         }
 
-        public void setTimestamp(LocalDateTime timestamp) {
+        public void setTimestamp(OffsetDateTime timestamp) {
             this.timestamp = timestamp;
         }
 

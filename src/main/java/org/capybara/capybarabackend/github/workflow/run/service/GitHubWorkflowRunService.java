@@ -1,5 +1,6 @@
 package org.capybara.capybarabackend.github.workflow.run.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.capybara.capybarabackend.account.model.AccountModel;
 import org.capybara.capybarabackend.account.service.AccountService;
 import org.capybara.capybarabackend.common.clients.carbonawareapi.CarbonAwareApiClient;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 @Service
@@ -32,27 +35,29 @@ public class GitHubWorkflowRunService {
         this.carbonAwareApiClient = carbonAwareApiClient;
     }
 
-    public GitHubWorkflowRunResponseModel schedule(@Valid GitHubWorkflowRunRequestModel gitHubWorkflowRunRequestModel) {
+    public GitHubWorkflowRunResponseModel schedule(@Valid GitHubWorkflowRunRequestModel gitHubWorkflowRunRequestModel) throws JsonProcessingException {
         Optional<AccountModel> optionalAccountModel = accountService.findByClientId(gitHubWorkflowRunRequestModel.getClientId());
         if (optionalAccountModel.isEmpty()) {
             throw new RuntimeException("Invalid clientId");
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime nowUtc = Instant.now().atOffset(ZoneOffset.UTC);
+        OffsetDateTime todayAtMidnightUtc = nowUtc.withHour(0).withMinute(0).withSecond(0).withNano(0);
+
         Integer approximateWorkflowRunDurationInMinutes = gitHubWorkflowRunRequestModel.getSchedule().getApproximateWorkflowRunDurationInMinutes() != null ?
                 gitHubWorkflowRunRequestModel.getSchedule().getApproximateWorkflowRunDurationInMinutes() :
                 DEFAULT_APPROXIMATE_WORKFLOW_RUN_DURATION_IN_MINUTES;
 
         ForecastBatchRequest forecastBatchRequest = new ForecastBatchRequest();
-        forecastBatchRequest.setRequestedAt(now);
+        forecastBatchRequest.setRequestedAt(todayAtMidnightUtc);
         forecastBatchRequest.setLocation(gitHubWorkflowRunRequestModel.getSchedule().getLocation());
-        forecastBatchRequest.setDataStartAt(now);
-        forecastBatchRequest.setDataEndAt(now.plusSeconds(gitHubWorkflowRunRequestModel.getSchedule().getMaximumDelayInSeconds()));
+        forecastBatchRequest.setDataStartAt(nowUtc);
+        forecastBatchRequest.setDataEndAt(nowUtc.plusSeconds(gitHubWorkflowRunRequestModel.getSchedule().getMaximumDelayInSeconds()));
         forecastBatchRequest.setWindowSize(approximateWorkflowRunDurationInMinutes);
 
         ForecastBatchResponse forecastBatchResponse = carbonAwareApiClient.forecastsBatch(forecastBatchRequest);
 
-        LocalDateTime bestTimeToStart = forecastBatchResponse.getOptimalDataPoints().getTimestamp();
+        OffsetDateTime bestTimeToStart = forecastBatchResponse.getOptimalDataPoints()[0].getTimestamp();
 
         GitHubWorkflowRunResponseModel gitHubWorkflowRunResponseModel = new GitHubWorkflowRunResponseModel();
         gitHubWorkflowRunResponseModel.setBestTimeToStart(bestTimeToStart);

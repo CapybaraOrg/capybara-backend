@@ -1,5 +1,6 @@
 package org.capybara.capybarabackend.github.workflow.run.web.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunRequestModel;
 import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunResponseModel;
 import org.capybara.capybarabackend.github.workflow.run.service.GitHubWorkflowRunService;
@@ -29,7 +30,8 @@ public class GitHubWorkflowRunController {
     }
 
     @PostMapping
-    public ResponseEntity<GitHubWorkflowRunResponse> schedule(@Valid @RequestBody GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
+    public ResponseEntity<GitHubWorkflowRunResponse> schedule(@Valid @RequestBody GitHubWorkflowRunRequest gitHubWorkflowRunRequest) throws
+            JsonProcessingException {
         log.info("Received POST /v1/github/workflows/runs request");
         log.info("Request body: {}",
                 gitHubWorkflowRunRequest);
@@ -37,7 +39,10 @@ public class GitHubWorkflowRunController {
         GitHubWorkflowRunResponseModel gitHubWorkflowRunResponseModel =
                 gitHubWorkflowRunService.schedule(newGitHubWorkflowRunRequestModel(gitHubWorkflowRunRequest));
 
-        return ResponseEntity.ok(newGitHubWorkflowRunResponse(gitHubWorkflowRunResponseModel));
+        GitHubWorkflowRunResponse gitHubWorkflowRunResponse = newGitHubWorkflowRunResponse(gitHubWorkflowRunResponseModel);
+
+        log.info("Response body: {}", gitHubWorkflowRunResponse);
+        return ResponseEntity.ok(gitHubWorkflowRunResponse);
     }
 
     private GitHubWorkflowRunRequestModel newGitHubWorkflowRunRequestModel(GitHubWorkflowRunRequest gitHubWorkflowRunRequest) {
