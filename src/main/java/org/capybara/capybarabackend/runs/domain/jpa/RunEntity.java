@@ -26,6 +26,14 @@ public class RunEntity extends BaseDateTimeEntity {
 
     private AccountEntity account;
 
+    private String githubOwner;
+
+    private String githubRepositoryName;
+
+    private String githubWorkflowId;
+
+    private String githubRef;
+
     public RunEntity() {
         // Empty constructor is required by JPA
     }
@@ -59,4 +67,39 @@ public class RunEntity extends BaseDateTimeEntity {
         this.account = account;
     }
 
+    @NotBlank
+    public String getGithubOwner() {
+        return githubOwner;
+    }
+
+    public void setGithubOwner(String githubOwner) {
+        this.githubOwner = githubOwner;
+    }
+
+    @NotBlank
+    public String getGithubRepositoryName() {
+        return githubRepositoryName;
+    }
+
+    public void setGithubRepositoryName(String githubRepositoryName) {
+        this.githubRepositoryName = githubRepositoryName;
+    }
+
+    @NotBlank
+    public String getGithubWorkflowId() {
+        return githubWorkflowId;
+    }
+
+    public void setGithubWorkflowId(String githubWorkflowId) {
+        this.githubWorkflowId = githubWorkflowId;
+    }
+
+    @NotBlank
+    public String getGithubRef() {
+        return githubRef;
+    }
+
+    public void setGithubRef(String githubRef) {
+        this.githubRef = githubRef;
+    }
 }

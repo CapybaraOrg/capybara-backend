@@ -38,13 +38,22 @@ public class ScheduleService {
 
             // TODO: add scheduling logic
 
-            WorkflowDispatchRequest workflowDispatchRequest = new WorkflowDispatchRequest();
-
             gitHubApiClient.workflowDispatch(
                     currentRunModel.getAccountModel().getDecryptedToken(),
-                    workflowDispatchRequest
+                    newWorkflowDispatchRequest(currentRunModel)
             );
         }
+    }
+
+    private WorkflowDispatchRequest newWorkflowDispatchRequest(RunModel runModel) {
+        WorkflowDispatchRequest workflowDispatchRequest = new WorkflowDispatchRequest();
+
+        workflowDispatchRequest.setOwner(runModel.getGitHubWorkflowRunRequestModel().getRepository().getOwner());
+        workflowDispatchRequest.setName(runModel.getGitHubWorkflowRunRequestModel().getRepository().getName());
+        workflowDispatchRequest.setWorkflowId(runModel.getGitHubWorkflowRunRequestModel().getRepository().getWorkflowId());
+        workflowDispatchRequest.setRef(runModel.getGitHubWorkflowRunRequestModel().getRepository().getRef());
+
+        return workflowDispatchRequest;
     }
 
 }

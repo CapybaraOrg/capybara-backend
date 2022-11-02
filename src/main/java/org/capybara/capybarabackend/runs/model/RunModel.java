@@ -1,6 +1,7 @@
 package org.capybara.capybarabackend.runs.model;
 
 import org.capybara.capybarabackend.account.model.AccountModel;
+import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunRequestModel;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -21,6 +22,8 @@ public class RunModel {
     private Status status;
 
     private OffsetDateTime scheduledTime;
+
+    private GitHubWorkflowRunRequestModel gitHubWorkflowRunRequestModel;
 
     @Size(min = CONSTRAINT_ID_MIN_SIZE, max = CONSTRAINT_ID_MAX_SIZE)
     public String getId() {
@@ -56,6 +59,15 @@ public class RunModel {
 
     public void setScheduledTime(OffsetDateTime scheduledTime) {
         this.scheduledTime = scheduledTime;
+    }
+
+    @NotNull
+    public GitHubWorkflowRunRequestModel getGitHubWorkflowRunRequestModel() {
+        return gitHubWorkflowRunRequestModel;
+    }
+
+    public void setGitHubWorkflowRunRequestModel(GitHubWorkflowRunRequestModel gitHubWorkflowRunRequestModel) {
+        this.gitHubWorkflowRunRequestModel = gitHubWorkflowRunRequestModel;
     }
 
     public enum Status {

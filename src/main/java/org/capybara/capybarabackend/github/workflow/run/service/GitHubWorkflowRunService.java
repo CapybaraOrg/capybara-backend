@@ -68,17 +68,18 @@ public class GitHubWorkflowRunService {
         GitHubWorkflowRunResponseModel gitHubWorkflowRunResponseModel = new GitHubWorkflowRunResponseModel();
         gitHubWorkflowRunResponseModel.setScheduledTime(scheduledTime);
 
-        runService.saveRun(newRunModel(optionalAccountModel.get(), scheduledTime));
+        runService.saveRun(newRunModel(optionalAccountModel.get(), scheduledTime, gitHubWorkflowRunRequestModel));
 
         return gitHubWorkflowRunResponseModel;
     }
 
-    private RunModel newRunModel(AccountModel accountModel, OffsetDateTime scheduledTime) {
+    private RunModel newRunModel(AccountModel accountModel, OffsetDateTime scheduledTime, GitHubWorkflowRunRequestModel gitHubWorkflowRunRequestModel) {
         RunModel runModel = new RunModel();
 
         runModel.setAccountModel(accountModel);
         runModel.setStatus(RunModel.Status.NEW);
         runModel.setScheduledTime(scheduledTime);
+        runModel.setGitHubWorkflowRunRequestModel(gitHubWorkflowRunRequestModel);
 
         return runModel;
     }

@@ -4,6 +4,7 @@ import org.capybara.capybarabackend.account.domain.jpa.AccountEntity;
 import org.capybara.capybarabackend.account.repository.jpa.AccountRepository;
 import org.capybara.capybarabackend.account.service.AccountService;
 import org.capybara.capybarabackend.account.service.cryptoservice.CryptoService;
+import org.capybara.capybarabackend.github.workflow.run.model.GitHubWorkflowRunRequestModel;
 import org.capybara.capybarabackend.runs.domain.jpa.RunEntity;
 import org.capybara.capybarabackend.runs.model.RunModel;
 import org.capybara.capybarabackend.runs.repository.jpa.RunRepository;
@@ -75,6 +76,10 @@ public class RunService {
         runEntity.setStatus(runModel.getStatus().toString());
         runEntity.setScheduledTime(runModel.getScheduledTime());
         runEntity.setAccount(optionalAccountEntity.get());
+        runEntity.setGithubOwner(runModel.getGitHubWorkflowRunRequestModel().getRepository().getOwner());
+        runEntity.setGithubRepositoryName(runModel.getGitHubWorkflowRunRequestModel().getRepository().getName());
+        runEntity.setGithubWorkflowId(runModel.getGitHubWorkflowRunRequestModel().getRepository().getWorkflowId());
+        runEntity.setGithubRef(runModel.getGitHubWorkflowRunRequestModel().getRepository().getRef());
 
         return runEntity;
     }
@@ -91,6 +96,14 @@ public class RunService {
         );
         runModel.setStatus(RunModel.Status.valueOf(runEntity.getStatus()));
         runModel.setScheduledTime(runEntity.getScheduledTime());
+        GitHubWorkflowRunRequestModel.Repository gitHubWorkflowRunRequestModelRepository = new GitHubWorkflowRunRequestModel.Repository();
+        gitHubWorkflowRunRequestModelRepository.setOwner(runEntity.getGithubOwner());
+        gitHubWorkflowRunRequestModelRepository.setName(runEntity.getGithubRepositoryName());
+        gitHubWorkflowRunRequestModelRepository.setWorkflowId(runEntity.getGithubWorkflowId());
+        gitHubWorkflowRunRequestModelRepository.setRef(runEntity.getGithubRef());
+        GitHubWorkflowRunRequestModel gitHubWorkflowRunRequestModel = new GitHubWorkflowRunRequestModel();
+        gitHubWorkflowRunRequestModel.setRepository(gitHubWorkflowRunRequestModelRepository);
+        runModel.setGitHubWorkflowRunRequestModel(gitHubWorkflowRunRequestModel);
 
         return runModel;
     }
