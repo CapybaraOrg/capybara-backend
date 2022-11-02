@@ -4,14 +4,14 @@ import java.time.OffsetDateTime;
 
 public class GitHubWorkflowRunResponseModel {
 
-    private OffsetDateTime bestTimeToStart;
+    private OffsetDateTime scheduledTime;
 
-    public OffsetDateTime getBestTimeToStart() {
-        return bestTimeToStart;
+    public OffsetDateTime getScheduledTime() {
+        return scheduledTime;
     }
 
-    public void setBestTimeToStart(OffsetDateTime bestTimeToStart) {
-        this.bestTimeToStart = bestTimeToStart;
+    public void setScheduledTime(OffsetDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
     }
 
 }

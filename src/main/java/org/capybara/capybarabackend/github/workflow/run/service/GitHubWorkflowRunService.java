@@ -63,12 +63,12 @@ public class GitHubWorkflowRunService {
 
         ForecastBatchResponse forecastBatchResponse = carbonAwareApiClient.forecastsBatch(forecastBatchRequest);
 
-        OffsetDateTime bestTimeToStart = forecastBatchResponse.getOptimalDataPoints()[0].getTimestamp();
+        OffsetDateTime scheduledTime = forecastBatchResponse.getOptimalDataPoints()[0].getTimestamp();
 
         GitHubWorkflowRunResponseModel gitHubWorkflowRunResponseModel = new GitHubWorkflowRunResponseModel();
-        gitHubWorkflowRunResponseModel.setBestTimeToStart(bestTimeToStart);
+        gitHubWorkflowRunResponseModel.setScheduledTime(scheduledTime);
 
-        runService.saveRun(newRunModel(optionalAccountModel.get(), bestTimeToStart));
+        runService.saveRun(newRunModel(optionalAccountModel.get(), scheduledTime));
 
         return gitHubWorkflowRunResponseModel;
     }

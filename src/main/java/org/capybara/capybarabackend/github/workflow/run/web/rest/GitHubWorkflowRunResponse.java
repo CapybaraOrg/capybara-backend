@@ -4,21 +4,21 @@ import java.time.OffsetDateTime;
 
 public class GitHubWorkflowRunResponse {
 
-    private OffsetDateTime bestTimeToStart;
+    private OffsetDateTime scheduledTime;
 
-    public OffsetDateTime getBestTimeToStart() {
-        return bestTimeToStart;
+    public OffsetDateTime getScheduledTime() {
+        return scheduledTime;
     }
 
-    public void setBestTimeToStart(OffsetDateTime bestTimeToStart) {
-        this.bestTimeToStart = bestTimeToStart;
+    public void setScheduledTime(OffsetDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "GitHubWorkflowRunResponse[bestTimeToStart='%s']",
-                getBestTimeToStart());
+                "GitHubWorkflowRunResponse[scheduledTime='%s']",
+                getScheduledTime());
     }
 
 }
