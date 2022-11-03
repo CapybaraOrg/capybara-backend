@@ -48,14 +48,14 @@ public class GitHubWorkflowRunService {
         }
 
         OffsetDateTime nowUtc = Instant.now().atOffset(ZoneOffset.UTC);
-        OffsetDateTime todayAtMidnightUtc = nowUtc.withHour(0).withMinute(0).withSecond(0).withNano(0);
+        OffsetDateTime nowMinusFiveMinutesUtc = nowUtc.minusMinutes(5);
 
         Integer approximateWorkflowRunDurationInMinutes = gitHubWorkflowRunRequestModel.getSchedule().getApproximateWorkflowRunDurationInMinutes() != null ?
                 gitHubWorkflowRunRequestModel.getSchedule().getApproximateWorkflowRunDurationInMinutes() :
                 DEFAULT_APPROXIMATE_WORKFLOW_RUN_DURATION_IN_MINUTES;
 
         ForecastBatchRequest forecastBatchRequest = new ForecastBatchRequest();
-        forecastBatchRequest.setRequestedAt(todayAtMidnightUtc);
+        forecastBatchRequest.setRequestedAt(nowMinusFiveMinutesUtc);
         forecastBatchRequest.setLocation(gitHubWorkflowRunRequestModel.getSchedule().getLocation());
         forecastBatchRequest.setDataStartAt(nowUtc);
         forecastBatchRequest.setDataEndAt(nowUtc.plusSeconds(gitHubWorkflowRunRequestModel.getSchedule().getMaximumDelayInSeconds()));
