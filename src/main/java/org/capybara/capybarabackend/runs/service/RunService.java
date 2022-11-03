@@ -70,10 +70,17 @@ public class RunService {
             throw new RuntimeException("Account not found");
         }
 
-        RunEntity runEntity = new RunEntity();
+        RunEntity runEntity;
         if (!StringUtils.hasLength(runModel.getId())) {
+            runEntity = new RunEntity();
             runEntity.setId(UUID.randomUUID().toString());
             runEntity.setCreated(now);
+        } else {
+            Optional<RunEntity> optionalRunEntity = runRepository.findById(runModel.getId());
+            if (optionalRunEntity.isEmpty()) {
+                throw new RuntimeException("RunEntity not found");
+            }
+            runEntity = optionalRunEntity.get();
         }
         runEntity.setModified(now);
         runEntity.setStatus(runModel.getStatus().toString());
