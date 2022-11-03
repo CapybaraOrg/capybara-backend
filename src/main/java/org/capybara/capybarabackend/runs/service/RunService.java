@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.transaction.Transactional;
@@ -70,8 +71,10 @@ public class RunService {
         }
 
         RunEntity runEntity = new RunEntity();
-        runEntity.setId(UUID.randomUUID().toString());
-        runEntity.setCreated(now);
+        if (!StringUtils.hasLength(runModel.getId())) {
+            runEntity.setId(UUID.randomUUID().toString());
+            runEntity.setCreated(now);
+        }
         runEntity.setModified(now);
         runEntity.setStatus(runModel.getStatus().toString());
         runEntity.setScheduledTime(runModel.getScheduledTime());
